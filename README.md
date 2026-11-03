@@ -15,6 +15,8 @@ Wisdom Core is a Python framework for AI agents built around a **Core Axiom**: o
 
 It works with any LLM you can reach from Python: any OpenAI-compatible API, Anthropic's Claude, Ollama, or your own model through a small adapter. It is free and open source (MIT), and a single Python file with no required dependencies.
 
+Read the [project overview](https://vickerymachinelogic.com/resources/wisdom-core/) and the [launch press release](https://vickerymachinelogic.com/resources/wisdom-core/press-release/) on the Vickery Machine Logic website.
+
 ```python
 from wisdom_core import Agent
 
@@ -339,6 +341,7 @@ It uses a scripted model and fake Ollama, OpenAI-style and Anthropic servers, so
 - **Questions, bugs and ideas:** open an [issue](https://github.com/VickeryMachineLogic/wisdom-core/issues). For a bug, include the version (`wisdom-core --version`), your Python version, the model backend and model names, and what you expected.
 - **Security problems:** please don't open a public issue. Report them privately through GitHub's [private vulnerability reporting](https://github.com/VickeryMachineLogic/wisdom-core/security/advisories/new). See [SECURITY.md](https://github.com/VickeryMachineLogic/wisdom-core/blob/main/SECURITY.md).
 - **Changes:** see the [CHANGELOG](https://github.com/VickeryMachineLogic/wisdom-core/blob/main/CHANGELOG.md).
+- **Project page and press:** the [Wisdom Core overview](https://vickerymachinelogic.com/resources/wisdom-core/) and [press release](https://vickerymachinelogic.com/resources/wisdom-core/press-release/).
 - **Help using it in a business:** Wisdom Core is made by [Vickery Machine Logic](https://vickerymachinelogic.com), which builds custom AI agents. [Get in touch](https://vickerymachinelogic.com/contact/).
 
 ## Contributing
