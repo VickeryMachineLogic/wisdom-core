@@ -355,4 +355,4 @@ MIT. Copyright (c) 2026 Vickery Machine Logic, LLC. See the LICENSE file. The sa
 
 ## Status
 
-Version 0.8.0, alpha. The interface may still change before 1.0.
+Version 0.8.1, alpha. The interface may still change before 1.0.

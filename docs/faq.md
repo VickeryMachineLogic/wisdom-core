@@ -57,7 +57,7 @@ Yes. A second process using the same file sees the changes. Give each agent its 
 
 ## Is it production-ready?
 
-It is alpha (0.8.0). The interface may still change before 1.0. It has a test suite that runs with no model and no network, but it is new, and you should watch what your agents learn.
+It is alpha (0.8.1). The interface may still change before 1.0. It has a test suite that runs with no model and no network, but it is new, and you should watch what your agents learn.
 
 ## Can Vickery Machine Logic help us use it?
 

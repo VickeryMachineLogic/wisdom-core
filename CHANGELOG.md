@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented in this file.
 
+## [0.8.1] - 2026-11-03
+
+Documentation only; no code changes.
+
+- New README with the Core Axiom, what makes the framework different, its alignment goal, and setup for any LLM.
+- New docs (getting started, concepts, examples, FAQ, API reference), examples, and contribution guidelines.
+
 ## [0.8.0] - 2026-11-03
 
 Initial public alpha release.

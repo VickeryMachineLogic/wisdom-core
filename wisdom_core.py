@@ -107,7 +107,7 @@ try:  # optional speed-up for large principle sets; everything works without it
 except Exception:  # pragma: no cover - depends on the environment
     _np = None
 
-__version__ = "0.8.0"
+__version__ = "0.8.1"
 
 __all__ = [
     "Agent",

@@ -1,6 +1,6 @@
 # API reference
 
-Generated from the docstrings and signatures in `wisdom_core.py` (version 0.8.0) by `tools/gen_api_reference.py`. It lists only the public names in `wisdom_core.__all__` and their public methods and properties. Names starting with `_` are internal and may change without notice.
+Generated from the docstrings and signatures in `wisdom_core.py` (version 0.8.1) by `tools/gen_api_reference.py`. It lists only the public names in `wisdom_core.__all__` and their public methods and properties. Names starting with `_` are internal and may change without notice.
 
 Contents: [`Agent`](#agent) · [`WisdomCore`](#wisdomcore) · [`Levels`](#levels) · [`Principle`](#principle) · [`SynthesisReport`](#synthesisreport) · [`Event`](#event) · [`Ollama`](#ollama) · [`OpenAICompatible`](#openaicompatible) · [`Anthropic`](#anthropic) · [`Combined`](#combined) · [`FunctionModel`](#functionmodel) · [`WisdomCoreError`](#wisdomcoreerror) · [`ModelError`](#modelerror) · [`check_embeddings`](#check_embeddings) · [`resolve_model`](#resolve_model) · [`fit_history`](#fit_history) · [`context_window_of`](#context_window_of) · [`embed_prompts_for`](#embed_prompts_for) · [`EMBED_PROMPTS`](#embed_prompts) · [`main`](#main) · [`__version__`](#version)
 
@@ -904,5 +904,5 @@ Chat with an agent that learns its own principles under a Core Axiom.
 
 ## __version__
 
-`__version__ = '0.8.0'`
+`__version__ = '0.8.1'`
 

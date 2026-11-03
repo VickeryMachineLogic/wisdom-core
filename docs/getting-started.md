@@ -13,7 +13,7 @@ Python 3.10 or newer. There are no other required dependencies. `pip install "wi
 Check the install:
 
 ```bash
-wisdom-core --version          # wisdom-core 0.8.0
+wisdom-core --version          # wisdom-core 0.8.1
 python -m wisdom_core --help   # the same command, run as a module
 ```
 
