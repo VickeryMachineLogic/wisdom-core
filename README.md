@@ -1,3 +1,5 @@
+<p align="center"><img src="https://raw.githubusercontent.com/VickeryMachineLogic/wisdom-core/main/.github/assets/wisdom-core-banner-1600.jpg" width="800" alt="wisdom-core by Vickery Machine Logic, LLC"></p>
+
 # Wisdom Core
 
 **An AI agent that learns its own principles from its work, steered by one sentence you write.**
