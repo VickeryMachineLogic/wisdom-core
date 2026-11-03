@@ -6,7 +6,7 @@
 
 [![PyPI](https://img.shields.io/pypi/v/wisdom-core)](https://pypi.org/project/wisdom-core/) [![Python](https://img.shields.io/pypi/pyversions/wisdom-core)](https://pypi.org/project/wisdom-core/) [![License: MIT](https://img.shields.io/badge/license-MIT-green)](https://github.com/VickeryMachineLogic/wisdom-core/blob/main/LICENSE)
 
-Wisdom Core is a Python framework for AI agents built around a **Core Axiom**: one sentence you write, saying what the agent is for. Everything else, the agent works out for itself.
+Wisdom Core is a Python framework for AI agents built around a **Core Axiom**: one sentence you write, saying what the agent is for. Everything else, the agent works out for itself. The project's larger goal is to make aligning your own agent practical for anyone.
 
 - **It learns its own principles.** After every task, the agent works out what the task taught and writes it down as a short, reusable **principle** in service of the Core Axiom.
 - **It uses them when it decides.** Before every decision, the Core Axiom and the principles most relevant to that decision go into its prompt, exactly as written.
@@ -33,6 +33,12 @@ Wisdom Core is a framework by John Vickery.
 - **You can see everything.** Principles are plain sentences, kept in one SQLite file per agent that you can read, back up and edit. Every change is logged with its reason, nothing is ever deleted, and the whole state exports as plain data.
 - **It works with any LLM.** Any OpenAI-compatible API, Anthropic, Ollama, or your own `chat` and `embed` functions. Chat through one model and search principles through another with `Combined`, and switch models later: the principles carry over.
 - **It fits the agent you already have.** Use the ready-made `Agent` chat loop, or add two calls to your own code: `core.inject(task)` before a decision, `core.synthesize(task, result)` after the task.
+
+## The goal: alignment you can do yourself
+
+One of the hopes behind Wisdom Core is to help with AI alignment: making sure an AI acts for the purpose people actually intend. Wisdom Core approaches it from the ground up, one agent at a time. You state the purpose in plain words as the Core Axiom, and everything the agent learns has to serve it. A principle that conflicts with the axiom is removed, the people the agent serves can push a principle into review, and every change is logged with its reason, so you can check what your agent has learned and why.
+
+The aim is to make aligning your own agent something anyone can do, not only large labs. Wisdom Core is a new, early-stage project (alpha), and this is a goal, not a solved problem. Testing and research results will be published here as they become available.
 
 ## Who it is for
 
