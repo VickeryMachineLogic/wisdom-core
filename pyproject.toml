@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wisdom-core"
+dynamic = ["version"]          # read from wisdom_core.__version__, so there is only one place to change it
+description = "An AI agent framework where one Core Axiom drives the principles the agent learns for itself."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+authors = [{ name = "John Vickery" }]
+keywords = ["ai", "agents", "llm", "agent-memory", "principles", "self-improving", "ollama"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/VickeryMachineLogic/wisdom-core"
+Source = "https://github.com/VickeryMachineLogic/wisdom-core"
+Issues = "https://github.com/VickeryMachineLogic/wisdom-core/issues"
+Changelog = "https://github.com/VickeryMachineLogic/wisdom-core/blob/main/CHANGELOG.md"
+
+[project.optional-dependencies]
+fast = ["numpy"]
+
+[project.scripts]
+wisdom-core = "wisdom_core:main"
+
+[tool.setuptools]
+py-modules = ["wisdom_core"]
+
+[tool.setuptools.dynamic]
+version = { attr = "wisdom_core.__version__" }
