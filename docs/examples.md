@@ -1,6 +1,6 @@
 # Examples
 
-All examples live in [`examples/`](../examples/). The four numbered ones run with **no model server and no network**: they use [`offline_model.py`](../examples/offline_model.py), a small rule-based stand-in plugged in through the public `FunctionModel` hook. It is not an AI model. Its answers and "lessons" are canned, picked by keywords, but everything around them (recall, injection, synthesis, the checks, the database, the history, standing and review) is the real framework. Swap in `Ollama()` or another backend to get real answers and real lessons.
+All examples live in [`examples/`](../examples/). The four numbered ones run with **no model server and no network**: they use [`offline_model.py`](../examples/offline_model.py), a small rule-based stand-in plugged in through the public `FunctionModel` hook. It is not an AI model. Its answers and "lessons" are canned, picked by keywords, but everything around them (recall, injection, synthesis, the checks, the database, the history, standing and review) is the real framework. Swap in a real backend (`OpenAICompatible(...)`, `Combined(Anthropic(...), ...)`, `Ollama()` or your own `FunctionModel`) to get real answers and real lessons.
 
 Run them from the repository root, with the package installed (`pip install wisdom-core`) or straight from a source checkout:
 
@@ -15,14 +15,14 @@ python examples/01_quickstart_offline.py
 | [`03_inspect_and_manage.py`](../examples/03_inspect_and_manage.py) | Reading what an agent holds: `principles()`, removing one by hand with `remove()`, seeing it retired (status `removed`) with `include_ended=True`, `history()`, `standing()`, `export_state()` / `import_state()` into a fresh database, and changing the axiom with `axiom_history()`. |
 | [`04_feedback_and_events.py`](../examples/04_feedback_and_events.py) | Principles earning their place: `respond()` then `synthesize(success=...)`, the user pushing back repeatedly, a principle coming into doubt and being reviewed, and an `on_event` handler counting every step. |
 
-These two came with the 0.8.0 release and need a real model (Ollama by default):
+These two came with the 0.8.0 release and need a real model: Ollama by default, or any OpenAI-compatible API (`demo.py --openai-base-url`; in `custom_agent.py`, change `model=`):
 
 | Script | What it shows |
 |---|---|
-| [`demo.py`](../examples/demo.py) | A seven-message money conversation against your own model, with a temporary database, printing what was learned after each task. `--model`, `--embed-model`, `--host`, `--openai-base-url`, `--api-key`, `--keep`. |
+| [`demo.py`](../examples/demo.py) | A seven-message money conversation against a real model, with a temporary database, printing what was learned after each task. `--model`, `--embed-model`, `--host`, `--openai-base-url`, `--api-key`, `--keep`. |
 | [`custom_agent.py`](../examples/custom_agent.py) | A two-step agent (plan, then answer) that injects before each step and synthesizes once at the end. Writes `career_agent.db` in the current folder. |
 
-## What the offline examples print
+## What the no-model examples print
 
 From `01_quickstart_offline.py` (the database path varies):
 

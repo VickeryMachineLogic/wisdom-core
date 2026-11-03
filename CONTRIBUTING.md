@@ -13,7 +13,7 @@ The best way to help right now is to tell us what you found. Please [open an iss
 For a bug, these help most:
 
 - the version (`wisdom-core --version`) and your Python version,
-- the model backend and model names (for example Ollama with `llama3.2` and `nomic-embed-text`),
+- the model backend and model names (for example `OpenAICompatible` with `gpt-4.1-mini` and `text-embedding-3-small`, or Ollama with `llama3.2` and `nomic-embed-text`),
 - what you did, what you expected, and what happened instead (the error text, or report lines such as `! learning failed: ...`).
 
 ## Security problems

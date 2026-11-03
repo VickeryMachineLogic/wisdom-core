@@ -11,7 +11,7 @@ license = "MIT"
 license-files = ["LICENSE"]
 requires-python = ">=3.10"
 authors = [{ name = "John Vickery" }]
-keywords = ["ai", "agents", "llm", "agent-memory", "principles", "self-improving", "ollama"]
+keywords = ["ai", "agents", "llm", "agent-memory", "principles", "self-improving", "core-axiom", "openai", "anthropic", "ollama"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",

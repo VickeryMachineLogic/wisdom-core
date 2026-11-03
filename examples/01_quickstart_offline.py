@@ -2,8 +2,10 @@
 
     python examples/01_quickstart_offline.py
 
-Uses the rule-based stand-in in offline_model.py, so the answers are canned. With Ollama
-running, replace `model=offline_model()` with nothing at all (Ollama is the default).
+Uses the rule-based stand-in in offline_model.py, so the answers are canned. For real
+answers, replace `model=offline_model()` with any backend, for example
+OpenAICompatible("gpt-4.1-mini", "text-embedding-3-small"), or leave it out for Ollama
+(the default).
 """
 
 import os

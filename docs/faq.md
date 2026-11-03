@@ -2,15 +2,15 @@
 
 ## What is Wisdom Core, in one paragraph?
 
-A Python framework that lets an AI agent learn from its own work. You write one sentence, the Core Axiom, saying what the agent is for. After every task the agent writes down what that task taught as a short principle in service of that sentence, and before every decision the most relevant principles go into its prompt. Principles that repeat each other are merged, wrong ones are removed, and ones the user keeps pushing back on are reviewed.
+A Python framework for AI agents built around one idea: you write one sentence, the Core Axiom, saying what the agent is for, and the agent works out the rest. After every task it writes down what that task taught as a short, reusable principle in service of that sentence, and before every decision the most relevant principles go into its prompt. Principles that repeat each other are merged, ones that conflict with the axiom or proved wrong are removed, and ones the user keeps pushing back on come into doubt and are reviewed. It works with any LLM: any OpenAI-compatible API, Anthropic, Ollama, or your own adapter.
 
 ## Is it free?
 
 Yes. It is open source under the MIT license, so you can use it, change it and ship it in commercial products, as long as the copyright and license notice go with it. The notice is at the top of `wisdom_core.py`, so it travels with the file.
 
-## Does my data leave my computer?
+## Where does my data go?
 
-Not with the default setup. With Ollama on your own machine or network, prompts, answers and principles stay there. Wisdom Core itself has no telemetry, account or update check; its only network calls go to the model backend you configure. If you use a hosted API (OpenAI-compatible or Anthropic), the prompts, including the principles injected into them, go to that provider.
+To the model backends you configure, and nowhere else. Prompts, answers and the principles injected into them are sent to the chat and embedding models you choose, under that provider's terms. Wisdom Core itself has no telemetry, account or update check. What the agent learns is stored in a SQLite file wherever you put it.
 
 ## Where is what it learned?
 
@@ -30,7 +30,14 @@ It stores lessons, not transcripts. Each task leaves at most one new principle, 
 
 ## Which models work?
 
-Ollama (the default), any server that speaks the OpenAI API (LM Studio, vLLM, llama.cpp's llama-server, Ollama's `/v1`, OpenAI, OpenRouter and similar), Anthropic's Messages API for chat (paired with another backend for embeddings), or your own functions through `FunctionModel`. You need both a chat model and an embedding model.
+Any LLM you can reach from Python:
+
+- **Any OpenAI-compatible API**, through `OpenAICompatible`: OpenAI itself, and servers such as LM Studio, vLLM, llama.cpp's llama-server and Ollama's `/v1`. Chat and embeddings.
+- **Anthropic's Claude**, through `Anthropic` (Messages API). Chat only, so pair it with a backend that has embeddings, in `Combined`.
+- **Ollama**, through `Ollama`, the default when no model is given. Chat and embeddings.
+- **Anything else**, through your own `chat` and `embed` functions in `FunctionModel`, or any object with `chat()` and `embed()` methods.
+
+You need both a chat model and an embedding model, and they can come from different backends (`Combined`).
 
 ## Which model should I use?
 
@@ -38,7 +45,7 @@ There is no benchmark in this project to point to. Principles are written by the
 
 ## Does it make answers slower or cost more?
 
-Yes, when learning is on. Each task adds one model call for the first look once principles exist, and two more when the task is new ground, plus occasional extra calls. On a local model that costs time, not money; on a hosted API it costs tokens. `learn=False` answers without learning, and `agent.respond()` followed by `agent.synthesize()` lets the answer go out before the learning runs.
+Yes, when learning is on. Each task adds one model call for the first look once principles exist, and two more when the task is new ground, plus occasional extra calls. Each call takes time, and on a paid API it costs tokens. `learn=False` answers without learning, and `agent.respond()` followed by `agent.synthesize()` lets the answer go out before the learning runs.
 
 ## Can several users share one agent?
 
@@ -54,7 +61,7 @@ It is alpha (0.8.0). The interface may still change before 1.0. It has a test su
 
 ## Can Vickery Machine Logic help us use it?
 
-Vickery Machine Logic, which makes Wisdom Core, builds custom AI agents for businesses, on your hardware or remotely. [Get in touch](https://vickerymachinelogic.com/contact/).
+Vickery Machine Logic, which makes Wisdom Core, builds custom AI agents for businesses. [Get in touch](https://vickerymachinelogic.com/contact/).
 
 ## How do I report a bug or a security problem?
 

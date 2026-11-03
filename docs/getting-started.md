@@ -1,6 +1,6 @@
 # Getting started
 
-This guide takes you from nothing to an agent that learns, then shows how to point it at other model servers and what to do when something goes wrong.
+This guide takes you from nothing to an agent that learns, shows how to use it with the LLM of your choice, and what to do when something goes wrong.
 
 ## 1. Install
 
@@ -36,14 +36,21 @@ Wisdom Core needs two kinds of model:
 - a **chat model**, which answers and writes the principles, and
 - an **embedding model**, which turns text into vectors so principles can be found by meaning.
 
-The default is [Ollama](https://ollama.com) on your own computer. Install Ollama, then pull one of each:
+Wisdom Core works with any LLM you can reach from Python. Pick one of these; each is a complete setup:
 
-```bash
-ollama pull llama3.2
-ollama pull nomic-embed-text
-```
+- **Any OpenAI-compatible API** (chat and embeddings). Set `$OPENAI_API_KEY`, plus `$OPENAI_BASE_URL` for a server other than OpenAI, and pass for example `model=OpenAICompatible("gpt-4.1-mini", "text-embedding-3-small")`.
+- **Anthropic** (chat). Set `$ANTHROPIC_API_KEY`. Anthropic has no embedding model, so pair Claude with a backend that has one: `model=Combined(Anthropic("claude-sonnet-4-5"), OpenAICompatible(embed_model="text-embedding-3-small"))`, or with `Ollama(embed_model=...)`.
+- **Ollama** (chat and embeddings), the default when you pass no `model` at all. Install [Ollama](https://ollama.com), then pull one of each:
 
-With no model names given, Wisdom Core uses the first chat model and the first embedding model Ollama has. The address is `http://localhost:11434` unless you set `$OLLAMA_HOST` or pass `host=`, so an Ollama server elsewhere on your network works too.
+  ```bash
+  ollama pull llama3.2
+  ollama pull nomic-embed-text
+  ```
+
+  With no model names given, Wisdom Core uses the first chat model and the first embedding model Ollama has, at `http://localhost:11434` unless you set `$OLLAMA_HOST` or pass `host=`.
+- **Anything else**, through your own two functions (`FunctionModel`, see section 5).
+
+The examples below leave `model` out, which means Ollama. Add `model=...` to use any of the others.
 
 ## 4. Your first agent
 
@@ -74,25 +81,31 @@ Inside the chat, `/principles`, `/history`, `/stats`, `/axiom`, `/reset`, `/help
 ## 5. Choose models
 
 ```python
+```python
 from wisdom_core import Agent, Ollama, OpenAICompatible, Anthropic, Combined, FunctionModel
 
-Agent(core_axiom=AXIOM, model="llama3.2")                                   # Ollama, chosen chat model
-Agent(core_axiom=AXIOM, model=Ollama("llama3.2", "nomic-embed-text", host="http://192.168.1.20:11434"))
-
-# Any OpenAI-compatible server: LM Studio, vLLM, llama.cpp's llama-server, Ollama's /v1, OpenAI and others
+# OpenAI, or any other server that speaks the OpenAI API (set base_url, or $OPENAI_BASE_URL)
+Agent(core_axiom=AXIOM, model=OpenAICompatible("gpt-4.1-mini", "text-embedding-3-small"))
 Agent(core_axiom=AXIOM, model=OpenAICompatible("qwen2.5-7b-instruct", "text-embedding-nomic-embed-text-v1.5",
                                                base_url="http://localhost:1234/v1"))
 
-# Claude for chat, with a local embedding model (Anthropic has no embeddings)
+# Claude for chat, with embeddings from another backend (Anthropic has no embedding model)
+Agent(core_axiom=AXIOM, model=Combined(Anthropic("claude-sonnet-4-5"), OpenAICompatible(embed_model="text-embedding-3-small")))
 Agent(core_axiom=AXIOM, model=Combined(Anthropic("claude-sonnet-4-5"), Ollama(embed_model="nomic-embed-text")))
 
-# Your own functions
+# Ollama (the default)
+Agent(core_axiom=AXIOM, model="llama3.2")                                   # chosen chat model
+Agent(core_axiom=AXIOM, model=Ollama("llama3.2", "nomic-embed-text", host="http://192.168.1.20:11434"))
+
+# Any other model or SDK: your own two functions
 Agent(core_axiom=AXIOM, model=FunctionModel(my_chat, my_embed))   # chat(messages) -> str, embed(texts) -> vectors
 ```
 
-`OpenAICompatible` reads `$OPENAI_BASE_URL` and `$OPENAI_API_KEY` when you don't pass `base_url` or `api_key`; `Anthropic` reads `$ANTHROPIC_API_KEY`. From the terminal, `--openai-base-url URL --model NAME --embed-model NAME` uses an OpenAI-compatible server.
+`OpenAICompatible` reads `$OPENAI_BASE_URL` (then `https://api.openai.com/v1`) and `$OPENAI_API_KEY` when you don't pass `base_url` or `api_key`; `Anthropic` reads `$ANTHROPIC_API_KEY`. `OpenAICompatible` lists other servers it has been written for: LM Studio, vLLM, llama.cpp's `llama-server` and Ollama's `/v1`.
 
-With a hosted API, your prompts (including the principles) go to that provider. With Ollama or another server on your own hardware, they stay with you.
+From the terminal, `--openai-base-url URL --model NAME --embed-model NAME` uses an OpenAI-compatible API (the key comes from `--api-key` or `$OPENAI_API_KEY`); without it, the command uses Ollama. Anthropic, `Combined` and `FunctionModel` are used from Python.
+
+Whichever backend you choose, your prompts (including the injected principles) go to it, under that provider's terms. You can change the chat model at any time; if you change the embedding model, stored principles are embedded again automatically.
 
 ## 6. Add it to an agent you already have
 
@@ -108,7 +121,7 @@ answer = my_agent(system_prompt, task)                                  # your o
 report = core.synthesize(task, answer, outcome="The user said it helped.")   # after the task
 ```
 
-See [Concepts](concepts.md) for what each call does, and [`examples/02_your_own_agent.py`](../examples/02_your_own_agent.py) for a version that runs offline.
+See [Concepts](concepts.md) for what each call does, and [`examples/02_your_own_agent.py`](../examples/02_your_own_agent.py) for a version that runs with no model at all.
 
 ## Troubleshooting
 
@@ -122,4 +135,4 @@ See [Concepts](concepts.md) for what each call does, and [`examples/02_your_own_
 | `... is a database that Wisdom Core did not create; give each agent its own file.` | `path=` points at some other SQLite file. |
 | `! learning failed: ...` in a report | The model's reply for the lesson could not be used. The answer was still given; `report.error` has the reason. Smaller models fail this more often. |
 
-Answers seem slow? Every task with learning on makes several model calls (see [Concepts](concepts.md#what-one-task-costs)). Model calls have no timeout by default, so a slow local model is waited for. `learn=False` or `--no-learn` answers without learning.
+Answers seem slow? Every task with learning on makes several model calls (see [Concepts](concepts.md#what-one-task-costs)). Model calls have no timeout by default, so a slow model is waited for. `learn=False` or `--no-learn` answers without learning.

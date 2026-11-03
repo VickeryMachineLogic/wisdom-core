@@ -2,20 +2,23 @@
 
 # Wisdom Core
 
-**An AI agent that learns its own principles from its work, steered by one sentence you write.**
+**You write one sentence. The agent works out the rest.**
 
 [![PyPI](https://img.shields.io/pypi/v/wisdom-core)](https://pypi.org/project/wisdom-core/) [![Python](https://img.shields.io/pypi/pyversions/wisdom-core)](https://pypi.org/project/wisdom-core/) [![License: MIT](https://img.shields.io/badge/license-MIT-green)](https://github.com/VickeryMachineLogic/wisdom-core/blob/main/LICENSE)
 
-A language model on its own keeps nothing from one conversation to the next. Wisdom Core gives an agent a lasting memory of what its work has taught it: a short list of lessons in plain language, which it keeps adding to and cleaning up as it goes.
+Wisdom Core is a Python framework for AI agents built around a **Core Axiom**: one sentence you write, saying what the agent is for. Everything else, the agent works out for itself.
 
-You write one sentence, the **Core Axiom**, saying what the agent is for. After every task, the agent works out what that task taught and writes it down as a **principle** in service of that sentence. Before every decision, the most relevant principles go into its prompt. Principles that say the same thing are combined, ones that turn out wrong are removed, and ones the user keeps pushing back on are reviewed.
+- **It learns its own principles.** After every task, the agent works out what the task taught and writes it down as a short, reusable **principle** in service of the Core Axiom.
+- **It uses them when it decides.** Before every decision, the Core Axiom and the principles most relevant to that decision go into its prompt, exactly as written.
+- **It keeps them clean.** Principles that say the same thing are merged. Ones that conflict with the Core Axiom or proved wrong are removed.
+- **It answers to the people it serves.** A principle behind answers the user keeps pushing back on is marked **in doubt** and reviewed: removed, revised, or found to stand. One that has served well many times is marked **proven**, and isn't removed over one disagreement.
 
-It is free and open source (MIT), a single Python file with no required dependencies, and it runs on your own computer with [Ollama](https://ollama.com) by default. Everything the agent learns sits in one SQLite file that you can read, back up and edit.
+It works with any LLM you can reach from Python: any OpenAI-compatible API, Anthropic's Claude, Ollama, or your own model through a small adapter. It is free and open source (MIT), and a single Python file with no required dependencies.
 
 ```python
 from wisdom_core import Agent
 
-agent = Agent(core_axiom="Give accurate answers and say plainly when you're unsure.")
+agent = Agent(core_axiom="Give accurate answers and say plainly when you're unsure.")   # model=... picks the LLM
 print(agent.ask("What should I check before signing a lease?"))
 print(agent.last_report.summary())   # what the agent just learned
 ```
@@ -27,21 +30,40 @@ Wisdom Core is a framework by John Vickery.
 - **One sentence steers the learning.** A system prompt shapes only the answer in front of it. The Core Axiom also decides what the agent learns from every task, because every principle is written, combined or removed to fit it.
 - **It keeps lessons, not transcripts.** What it stores are short, reusable principles ("Pay off the highest-interest debt first once minimum payments are covered."), each with why it matters, where it stops and when it applies.
 - **It cleans up after itself.** Near-duplicates are merged, contradictions and mistakes are removed, and a principle behind answers the user keeps pushing back on comes into doubt and is reviewed. Nothing is removed on a count alone.
-- **You can see everything.** Principles are plain sentences. Every change is logged with its reason, nothing is ever deleted, and the whole state exports as plain data.
-- **It is yours and it is local.** One file, standard library only, Ollama on your own machine by default. No account, no hosted service and no telemetry. The only network calls go to the model server you point it at.
+- **You can see everything.** Principles are plain sentences, kept in one SQLite file per agent that you can read, back up and edit. Every change is logged with its reason, nothing is ever deleted, and the whole state exports as plain data.
+- **It works with any LLM.** Any OpenAI-compatible API, Anthropic, Ollama, or your own `chat` and `embed` functions. Chat through one model and search principles through another with `Combined`, and switch models later: the principles carry over.
 - **It fits the agent you already have.** Use the ready-made `Agent` chat loop, or add two calls to your own code: `core.inject(task)` before a decision, `core.synthesize(task, result)` after the task.
+
+## Who it is for
+
+- **Developers building agents** who want them to get better at a job from their own work, in the direction one sentence sets.
+- **Teams with an agent already running.** Add two calls to the code you have: `core.inject(task)` before a decision and `core.synthesize(task, result)` after the task.
+- **Anyone who needs to see why an agent acts as it does.** What it has learned is a list of plain sentences, with a logged reason for every change.
 
 ## Quickstart
 
-1. Install the package, plus a chat model and an embedding model in [Ollama](https://ollama.com). The package installs in seconds; the models are a few gigabytes to download.
+1. Install the package:
 
    ```bash
    pip install wisdom-core
-   ollama pull llama3.2
-   ollama pull nomic-embed-text
    ```
 
-2. Chat with an agent that learns:
+2. Pick a model. Wisdom Core needs a chat model and an embedding model (principles are searched by meaning). Use whichever you like:
+
+   - **Ollama (the default, nothing to configure):** `ollama pull llama3.2` and `ollama pull nomic-embed-text`, then leave `model` out.
+   - **Any OpenAI-compatible API:** set `$OPENAI_API_KEY` (and `$OPENAI_BASE_URL` for a server other than OpenAI), then pass `model=OpenAICompatible("gpt-4.1-mini", "text-embedding-3-small")`.
+   - **Anthropic:** set `$ANTHROPIC_API_KEY`. Claude has no embedding model, so pair it with a backend that has one: `model=Combined(Anthropic("claude-sonnet-4-5"), OpenAICompatible(embed_model="text-embedding-3-small"))`.
+
+   ```python
+   from wisdom_core import Agent, Anthropic, Combined, OpenAICompatible
+
+   agent = Agent(core_axiom="Help people make sound money decisions.",
+                 model=OpenAICompatible("gpt-4.1-mini", "text-embedding-3-small"))
+   print(agent.ask("Should I pay off my car loan early?"))
+   print(agent.last_report.summary())
+   ```
+
+3. Or chat from a terminal (Ollama, or any OpenAI-compatible API with `--openai-base-url`):
 
    ```bash
    wisdom-core --axiom "Help people make sound money decisions."
@@ -49,18 +71,16 @@ Wisdom Core is a framework by John Vickery.
 
    After each answer it prints what it learned, such as `+ added: ...` or `~ already held, so nothing more ran`. Type `/principles` to see what it holds.
 
-3. Or use it from Python, as in the example at the top.
+How fast answers come and how good the principles are depends on the model you use.
 
-Answers come from your own model, so how fast they come and how good the principles are depends on the model you run.
-
-**No model server yet?** [`examples/01_quickstart_offline.py`](https://github.com/VickeryMachineLogic/wisdom-core/blob/main/examples/01_quickstart_offline.py) runs the whole learning loop with a small rule-based stand-in model, so you can see the mechanics before installing Ollama. The [Getting started guide](https://github.com/VickeryMachineLogic/wisdom-core/blob/main/docs/getting-started.md) walks through both.
+**Want to see the mechanics first?** [`examples/01_quickstart_offline.py`](https://github.com/VickeryMachineLogic/wisdom-core/blob/main/examples/01_quickstart_offline.py) runs the whole learning loop with a small rule-based stand-in model, with no model or API key at all. The [Getting started guide](https://github.com/VickeryMachineLogic/wisdom-core/blob/main/docs/getting-started.md) walks through each backend.
 
 ## Documentation
 
-- [Getting started](https://github.com/VickeryMachineLogic/wisdom-core/blob/main/docs/getting-started.md): install, first agent, other model servers, troubleshooting.
+- [Getting started](https://github.com/VickeryMachineLogic/wisdom-core/blob/main/docs/getting-started.md): install, first agent, choosing a model backend, troubleshooting.
 - [Concepts](https://github.com/VickeryMachineLogic/wisdom-core/blob/main/docs/concepts.md): the Core Axiom, principles, injection, synthesis, distillation and standing, in plain words.
 - [Examples](https://github.com/VickeryMachineLogic/wisdom-core/blob/main/docs/examples.md): runnable scripts, and what each one shows.
-- [FAQ](https://github.com/VickeryMachineLogic/wisdom-core/blob/main/docs/faq.md): privacy, cost, limits, and when to use it.
+- [FAQ](https://github.com/VickeryMachineLogic/wisdom-core/blob/main/docs/faq.md): models, data, cost, limits, and when to use it.
 - [API reference](https://github.com/VickeryMachineLogic/wisdom-core/blob/main/docs/api-reference.md): every public class and function, generated from the code.
 
 ## The idea
@@ -83,14 +103,12 @@ pip install "wisdom-core[fast]"     # optional: numpy, for faster search over la
 
 Python 3.10 or newer, with no other dependencies. `wisdom_core.py` is a single file, so you can also copy it into a project.
 
-You also need a model. By default Wisdom Core uses [Ollama](https://ollama.com) on your computer, with the first chat model and the first embedding model it finds:
+You also need a chat model and an embedding model, from any backend (see Models, below). With no `model` given, Wisdom Core uses [Ollama](https://ollama.com) and the first chat model and first embedding model it has:
 
 ```bash
 ollama pull llama3.2
 ollama pull nomic-embed-text
 ```
-
-Any OpenAI-compatible server, Anthropic's API, or your own functions work too (see Models, below).
 
 ## Chat from a terminal
 
@@ -101,19 +119,19 @@ wisdom-core --axiom "Help people make sound money decisions."
 
 After every answer it prints what the Wisdom Core did, for example `+ added: ...`, `= merged 2 into: ...`, `= revised: ... -> ...`, `- removed: ...`, `~ already covered by: ...` or `~ already held, so nothing more ran`. Inside the chat, `/principles`, `/history`, `/stats`, `/axiom`, `/reset`, `/help` and `/quit` do what they say.
 
-You need the axiom only the first time. After that it is read from the database, which is `wisdom.db` unless you pass `--db`. `wisdom-core --principles` and `wisdom-core --history` print a database without starting a model. `--model`, `--embed-model`, `--host`, `--openai-base-url`, `--api-key`, `--context` and `--no-learn` choose the rest; `wisdom-core --help` lists them.
+You need the axiom only the first time. After that it is read from the database, which is `wisdom.db` unless you pass `--db`. `wisdom-core --principles` and `wisdom-core --history` print a database without starting a model. The terminal command talks to Ollama, or to any OpenAI-compatible API with `--openai-base-url URL --model NAME --embed-model NAME` (the key comes from `--api-key` or `$OPENAI_API_KEY`). `--host`, `--context` and `--no-learn` choose the rest; `wisdom-core --help` lists them. For Anthropic, use Python.
 
-The source package on PyPI includes `examples/demo.py`. It runs a short conversation against your own model with a temporary database, and prints what the Wisdom Core learned after each task.
+The source package on PyPI includes `examples/demo.py`. It runs a short conversation against a real model (Ollama, or an OpenAI-compatible API) with a temporary database, and prints what the Wisdom Core learned after each task.
 
 ## Use it inside your own agent
 
 `Agent` is a ready-made chat loop. If you already have an agent, use `WisdomCore` directly: inject before each decision, and synthesize after each task.
 
 ```python
-from wisdom_core import WisdomCore, Ollama
+from wisdom_core import WisdomCore
 
 core = WisdomCore(core_axiom="Help people get and keep good work.",
-                  model=Ollama("llama3.2"), path="career_agent.db")
+                  model=my_backend, path="career_agent.db")   # any backend, see Models
 
 task = "How should I prepare for a job interview?"
 system_prompt = "You are a careful assistant.\n\n" + core.inject(task)    # before every decision
@@ -131,7 +149,7 @@ print(report.summary())
 - `used` is the principles injected for this task (from `core.recall`).
 - `previous` is the principles behind the previous answer.
 
-[`examples/custom_agent.py`](https://github.com/VickeryMachineLogic/wisdom-core/blob/main/examples/custom_agent.py) shows a two-step agent that injects before each step, and [`examples/02_your_own_agent.py`](https://github.com/VickeryMachineLogic/wisdom-core/blob/main/examples/02_your_own_agent.py) runs the same pattern offline.
+[`examples/custom_agent.py`](https://github.com/VickeryMachineLogic/wisdom-core/blob/main/examples/custom_agent.py) shows a two-step agent that injects before each step, and [`examples/02_your_own_agent.py`](https://github.com/VickeryMachineLogic/wisdom-core/blob/main/examples/02_your_own_agent.py) runs the same pattern with no model at all.
 
 ## What happens in one task
 
@@ -204,21 +222,30 @@ Each text is also written the way its embedding model expects. Search queries, s
 
 | Backend | Use |
 |---|---|
-| `Ollama(model=None, embed_model=None, *, host=None, num_ctx=None, timeout=None, keep_alive=None)` | Local or LAN Ollama. Models are chosen automatically if not given, and `host` falls back to `$OLLAMA_HOST`. The context window is read from the model and capped at 16,384 tokens, unless you pass `num_ctx`. |
-| `OpenAICompatible(model=None, embed_model=None, *, base_url=None, api_key=None, timeout=None)` | OpenAI, LM Studio, vLLM, llama.cpp's `llama-server`, Ollama's `/v1`, OpenRouter and similar servers. `base_url` and `api_key` fall back to `$OPENAI_BASE_URL` and `$OPENAI_API_KEY`. |
-| `Anthropic(model=None, *, api_key=None, base_url=None, timeout=None, max_tokens=None)` | Claude, through Anthropic's Messages API. `api_key` falls back to `$ANTHROPIC_API_KEY`. It has no embeddings, so pair it with another backend in `Combined`. |
+| `OpenAICompatible(model=None, embed_model=None, *, base_url=None, api_key=None, timeout=None)` | Any server that speaks the OpenAI API: OpenAI itself, and servers such as LM Studio, vLLM, llama.cpp's `llama-server` and Ollama's `/v1`. `base_url` and `api_key` fall back to `$OPENAI_BASE_URL` (then `https://api.openai.com/v1`) and `$OPENAI_API_KEY`. Chat and embeddings. |
+| `Anthropic(model=None, *, api_key=None, base_url=None, timeout=None, max_tokens=None)` | Claude, through Anthropic's Messages API. `api_key` falls back to `$ANTHROPIC_API_KEY`. Chat only: Anthropic has no embedding model, so pair it with a backend that has one in `Combined`. |
+| `Ollama(model=None, embed_model=None, *, host=None, num_ctx=None, timeout=None, keep_alive=None)` | An Ollama server, and the default when `model` is left out. Models are chosen automatically if not given, and `host` falls back to `$OLLAMA_HOST`, then `http://localhost:11434`. The context window is read from the model and capped at 16,384 tokens, unless you pass `num_ctx`. Chat and embeddings. |
 | `Combined(chat, embed)` | Chat through one backend and search principles through another. |
-| `FunctionModel(chat, embed, *, name="custom", embed_name=None)` | Your own functions: `chat(messages) -> str` and `embed(texts) -> list of vectors`. |
+| `FunctionModel(chat, embed, *, name="custom", embed_name=None)` | Your own functions: `chat(messages) -> str` and `embed(texts) -> list of vectors`. This is how to connect any other model or SDK. |
+
+Any object with `chat(messages, *, json_mode=False, temperature=None) -> str`, `embed(texts) -> list of vectors`, `name` and `embed_name` also works as a model.
 
 ```python
-from wisdom_core import Agent, Anthropic, Combined, Ollama
+from wisdom_core import Agent, Anthropic, Combined, Ollama, OpenAICompatible
 
+# Claude for chat, OpenAI embeddings for search
+agent = Agent(core_axiom="Help people make sound money decisions.",
+              model=Combined(Anthropic("claude-sonnet-4-5"), OpenAICompatible(embed_model="text-embedding-3-small")))
+
+# Claude for chat, an Ollama embedding model for search
 agent = Agent(core_axiom="Help people make sound money decisions.",
               model=Combined(Anthropic("claude-sonnet-4-5"), Ollama(embed_model="nomic-embed-text")))
 ```
 
+- **Embeddings are required.** Principles are found by meaning, so every setup needs an embedding model: from `OpenAICompatible`, `Ollama`, your own `FunctionModel`, or a second backend in `Combined`.
+- **Switching models.** Change the chat model whenever you like. If you change the embedding model, stored principles are embedded again automatically.
 - **Shorthand.** `model="llama3.2"` means `Ollama("llama3.2")`.
-- **No timeouts.** Model calls have no timeout by default, so a slow local model is waited for rather than cut off.
+- **No timeouts.** Model calls have no timeout by default, so a slow model is waited for rather than cut off.
 - **Thinking.** On Ollama, the framework's own calls switch a reasoning model's thinking off, and the answer keeps the model's default.
 - **Streaming.** Replies stream whenever something is watching (below).
 
@@ -245,24 +272,25 @@ Each agent has one SQLite file (`wisdom.db` unless you pass `path=`).
 
 `core.export_state()` returns the whole of an agent's learning as plain data: every axiom, every principle as written, the log and the calibration, without the principles' vectors. `core.import_state(state)` rebuilds it in a database that holds no principles yet (or any database, with `replace=True`), and the principles are embedded again the first time they are searched. A new database still needs a Core Axiom to open, so open it with one (for example `WisdomCore(core_axiom=state["axiom"], path="copy.db")`); the import then replaces it with the backup's axiom history.
 
-## Private and local by default
+## Data and network
 
-- **Your data stays where your model runs.** With the default Ollama backend, the prompts, answers and principles stay on your computer or your own network. Point it at a hosted API (OpenAI-compatible or Anthropic) and the prompts go to that service, under its terms.
-- **No telemetry.** Wisdom Core makes network calls only to the model backend you configure. It has no account, analytics or update check.
+- **Prompts go to the model you choose.** Prompts, answers and the injected principles are sent to the model backends you configure, under that provider's terms.
+- **No telemetry.** Wisdom Core makes network calls only to the model backends you configure. It has no account, analytics or update check.
 - **Plain files you control.** One SQLite file per agent, which any SQLite tool can open. `wisdom-core --db FILE --principles` and `--history` print it without starting a model.
-- **Model calls have no timeout by default**, so a slow local model is waited for, not cut off. `Ollama`, `OpenAICompatible` and `Anthropic` each take a `timeout` if you want one.
+- **Model calls have no timeout by default**, so a slow model is waited for, not cut off. `Ollama`, `OpenAICompatible` and `Anthropic` each take a `timeout` if you want one.
 
 ## Limits
 
 Wisdom Core is alpha software. Know these before you depend on it:
 
 - **The interface may change before 1.0.**
-- **Learning costs model calls.** Each task with learning on is one call for the answer, one for the first look once principles exist, and two more on new ground, plus occasional extra calls (see *What happens in one task*). On a small local model that takes time. `learn=False` (or `--no-learn`) answers without learning.
+- **Learning costs model calls.** Each task with learning on is one call for the answer, one for the first look once principles exist, and two more on new ground, plus occasional extra calls (see *What happens in one task*). Each call takes time, and on a paid API it costs tokens. `learn=False` (or `--no-learn`) answers without learning.
 - **Principles are only as good as the model that writes them.** A small model can draft weak principles or replies the framework cannot read. A failed lesson never costs the answer: it shows in `SynthesisReport.error`. Read what an agent holds now and then (`/principles`, `core.principles()`, `core.history()`) and remove what you disagree with (`core.remove`).
 - **What users say shapes later prompts.** Lessons learned from one conversation are injected into later ones for every user of that database. If an agent talks with people you don't trust, review its principles, give each audience its own database, or turn learning off.
 - **One agent per database file.** Several processes can share a file, but don't point two different agents at one.
 - **Search is simple.** Every active principle's vectors are held in memory and compared on each search. Install `wisdom-core[fast]` (numpy) to speed that up for large principle sets.
-- **Anthropic's API has no embeddings,** so pair it with another backend in `Combined`.
+- **Every setup needs an embedding model.** Anthropic's API has none, so pair it with a backend that has one in `Combined`.
+- **The terminal command covers Ollama and OpenAI-compatible APIs.** Anthropic, `Combined` and `FunctionModel` are used from Python.
 
 ## Reference
 
