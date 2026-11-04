@@ -2,18 +2,22 @@
 
 # Wisdom Core
 
-**You write one sentence. The agent works out the rest.**
+**Whose values is an AI agent following? Wisdom Core makes the answer explicit, inspectable, and owned.**
+
+> A project in its infancy: early alpha (0.8.1), in active development. Testing and refinement are underway, and feedback through GitHub Issues helps shape where it goes.
 
 [![PyPI](https://img.shields.io/pypi/v/wisdom-core)](https://pypi.org/project/wisdom-core/) [![Python](https://img.shields.io/pypi/pyversions/wisdom-core)](https://pypi.org/project/wisdom-core/) [![License: MIT](https://img.shields.io/badge/license-MIT-green)](https://github.com/VickeryMachineLogic/wisdom-core/blob/main/LICENSE)
 
-Wisdom Core is a Python framework for AI agents built around a **Core Axiom**: one sentence you write, saying what the agent is for. Everything else, the agent works out for itself. The project's larger goal is to make aligning your own agent practical for anyone.
+Wisdom Core is an early-stage, open-source Python framework (MIT) that gives AI agents a persistent, auditable value system.
 
-- **It learns its own principles.** After every task, the agent works out what the task taught and writes it down as a short, reusable **principle** in service of the Core Axiom.
-- **It uses them when it decides.** Before every decision, the Core Axiom and the principles most relevant to that decision go into its prompt, exactly as written.
-- **It keeps them clean.** Principles that say the same thing are merged. Ones that conflict with the Core Axiom or proved wrong are removed.
-- **It answers to the people it serves.** A principle behind answers the user keeps pushing back on is marked **in doubt** and reviewed: removed, revised, or found to stand. One that has served well many times is marked **proven**, and isn't removed over one disagreement.
+- **Core Axiom.** A root principle, written in plain language, is injected into every decision. Every principle the agent learns is evaluated against it.
+- **Learned principles.** After each exchange, a synthesis pass extracts what the interaction taught and records it as a principle. Principles live in a local SQLite database and are embedded for semantic retrieval, so the most relevant ones (12 by default) shape each decision.
+- **Distillation.** Near-duplicate principles are merged by embedding similarity, with thresholds calibrated to the embedding model in use. Principles that conflict with the axiom or with each other are removed, with a stated reason.
+- **Feedback-weighted review.** The framework tracks which principles shaped each answer and how it was received. A principle behind answers that draw disproportionate pushback is flagged, then revised, removed, or confirmed. Nothing is removed on a count alone.
+- **Full audit trail.** Every principle, merge, removal, and axiom change is logged as an event with its reason and timestamp, in a local file under the owner's control.
+- **Model-agnostic.** Runs on Ollama, any OpenAI-compatible server, or Anthropic, with only the Python standard library.
 
-It works with any LLM you can reach from Python: any OpenAI-compatible API, Anthropic's Claude, Ollama, or your own model through a small adapter. It is free and open source (MIT), and a single Python file with no required dependencies.
+Developers building agents are warmly invited to try it, open an issue, and help shape where it goes. The project mark, a glowing brain with a heart at its center, was drawn by its creator, John Vickery.
 
 Read the [project overview](https://vickerymachinelogic.com/resources/wisdom-core/) and the [launch press release](https://vickerymachinelogic.com/resources/wisdom-core/press-release/) on the Vickery Machine Logic website.
 
@@ -32,7 +36,7 @@ Wisdom Core is a framework by John Vickery.
 - **One sentence steers the learning.** A system prompt shapes only the answer in front of it. The Core Axiom also decides what the agent learns from every task, because every principle is written, combined or removed to fit it.
 - **It keeps lessons, not transcripts.** What it stores are short, reusable principles ("Pay off the highest-interest debt first once minimum payments are covered."), each with why it matters, where it stops and when it applies.
 - **It cleans up after itself.** Near-duplicates are merged, contradictions and mistakes are removed, and a principle behind answers the user keeps pushing back on comes into doubt and is reviewed. Nothing is removed on a count alone.
-- **You can see everything.** Principles are plain sentences, kept in one SQLite file per agent that you can read, back up and edit. Every change is logged with its reason, nothing is ever deleted, and the whole state exports as plain data.
+- **You can see everything.** Principles are plain sentences, kept in one SQLite file per agent that you can read, back up and edit. Every change is logged with its reason; removed principles leave the active set, but the event log keeps what was removed and why, and the whole state exports as plain data.
 - **It works with any LLM.** Any OpenAI-compatible API, Anthropic, Ollama, or your own `chat` and `embed` functions. Chat through one model and search principles through another with `Combined`, and switch models later: the principles carry over.
 - **It fits the agent you already have.** Use the ready-made `Agent` chat loop, or add two calls to your own code: `core.inject(task)` before a decision, `core.synthesize(task, result)` after the task.
 

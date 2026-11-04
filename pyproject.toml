@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "wisdom-core"
 dynamic = ["version"]          # read from wisdom_core.__version__, so there is only one place to change it
-description = "An AI agent framework where one Core Axiom drives the principles the agent learns for itself."
+description = "Early-stage framework giving AI agents a persistent, auditable value system: an axiom-checked set of learned principles with a full event log."
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
