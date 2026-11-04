@@ -19,6 +19,27 @@ Wisdom Core is an early-stage, open-source Python framework (MIT) that gives AI 
 
 Developers building agents are warmly invited to try it, open an issue, and help shape where it goes. The project mark, a glowing brain with a heart at its center, was drawn by its creator, John Vickery.
 
+## How it works in practice
+
+An agent built on Wisdom Core runs a simple loop. Before each decision, the Core Axiom and the most relevant learned principles are retrieved by meaning and placed into the prompt exactly as written. After each exchange, a synthesis pass reviews what was said, the agent's reasoning, and how the answer landed, then records what the interaction taught as a principle that must fit the axiom. A quick first check skips this step when the lesson is already known, so the principle set grows only when something new is learned.
+
+Over time, distillation is designed to keep that set lean and consistent. Principles that say nearly the same thing are merged. Principles that contradict the axiom or each other are removed, and the reason is logged. Principles tied to answers that keep drawing pushback come into doubt and are reviewed, while principles that have served well many times are marked as proven and protected from removal over a single disagreement. The aim is an agent whose behavior is shaped by a small, readable body of principles rather than an opaque pile of past conversations.
+
+## Where we hope it can help
+
+Our hope is that Wisdom Core can become a useful foundation wherever people need to see, and shape, the values an AI agent works from. Some of the places it could be applied:
+
+- Customer support agents: corrections from staff and customers can be recorded as lasting principles, and each change in behavior can be traced to a logged reason.
+- Personal and executive assistants: preferences, tone, and standing instructions can accumulate as principles tied to one root value, rather than being lost when a conversation ends.
+- Review-heavy settings: teams in areas such as finance, healthcare administration, legal operations, and education could inspect which principles an agent holds, when each was added, and why any was changed or removed.
+- Tutoring and coaching tools: an agent could adapt to how a learner responds while staying anchored to a stated teaching principle, such as accuracy over encouragement.
+- Internal company copilots: an organization could write its own axiom, such as honesty with customers or caution with private data, and keep a local, auditable record of how the agent's working principles evolve.
+- Research and experimentation: the event log and portable SQLite file are meant to make it practical to study how an agent's values change over time and to compare different axioms.
+
+Because Wisdom Core runs on Ollama, any OpenAI-compatible server, or Anthropic, and needs only the Python standard library, it can sit alongside an existing agent or power a new one, on a laptop or a private server, with the principle database stored locally.
+
+Wisdom Core is still in its infancy. These are possibilities we are working toward, not proven deployments. Our hope is that early testers, real use cases, and contributions will show where it helps most and shape what it becomes.
+
 Read the [project overview](https://vickerymachinelogic.com/resources/wisdom-core/) and the [launch press release](https://vickerymachinelogic.com/resources/wisdom-core/press-release/) on the Vickery Machine Logic website.
 
 ```python
